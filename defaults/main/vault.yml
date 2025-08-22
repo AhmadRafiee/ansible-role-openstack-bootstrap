@@ -1,3 +1,4 @@
+---
 openstack_auth:
   auth_url: "https://your-openstack-auth-url:5000/v3"
   username: "admin"
