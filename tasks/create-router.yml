@@ -22,13 +22,13 @@
   register: networks_info
 
 - name: Gather interfaces to add
-  set_fact:
+  ansible.builtin.set_fact:
     router_interfaces: "{{ router_interfaces | default([]) + [{
       'net': (networks_info.networks | selectattr('id', 'equalto', item.network_id) | first).name,
       'subnet': item.name,
       'ip_address': item.gateway_ip }] }}"
   loop: "{{ subnet_info.subnets }}"
-  when: item['router:external'] == false
+  when: item['router:external'] is false
 
 - name: Add all subnets to router
   openstack.cloud.router:
