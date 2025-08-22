@@ -16,4 +16,7 @@ galaxy_info:
     - cloud
     - automation
     - infrastructure
-dependencies: []
+dependencies:
+  - name: openstack.cloud
+    src: ansible-galaxy
+    version: ">=2.0.0"

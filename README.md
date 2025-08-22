@@ -6,6 +6,7 @@ This Ansible playbook automates the deployment and management of an OpenStack en
 - [OpenStack Bootstrap with Ansible](#openstack-bootstrap-with-ansible)
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
+  - [Installing Dependencies](#installing-dependencies)
   - [Prerequisites](#prerequisites)
   - [Playbook Structure](#playbook-structure)
   - [Configuration Details](#configuration-details)
@@ -31,6 +32,14 @@ This Ansible project bootstraps an OpenStack cloud infrastructure by:
 
 The main playbook (`main.yml`) imports tasks from separate YAML files for each resource type, making it organized and reusable.
 
+## Installing Dependencies
+
+Install the required collections using the provided `requirements.yml` file:
+
+```bash
+ansible-galaxy install -r requirements.yml
+```
+
 ## Prerequisites
 To run this playbook, ensure the following:
 - **Ansible**: Version 2.9 or higher.
@@ -39,6 +48,7 @@ To run this playbook, ensure the following:
 - **Python Dependencies**: Required for OpenStack modules (e.g., `openstacksdk`).
 - **SSH Public Keys**: Keys must be provided in the `ssh_keys` variable.
 - **Image Download Access**: URLs for images must be accessible; downloads are saved to `image_path`.
+
 
 Run the playbook on a control node with network access to the OpenStack API.
 
