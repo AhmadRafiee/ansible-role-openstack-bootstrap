@@ -1,0 +1,15 @@
+---
+- name: Add multiple SSH keys to OpenStack
+  openstack.cloud.keypair:
+    auth: "{{ openstack_auth }}"
+    name: "{{ item.name }}"
+    public_key: "{{ item.public_key }}"
+    state: present
+  loop: "{{ ssh_keys }}"
+  register: keypair_result
+
+- name: Debug keypair creation
+  ansible.builtin.debug:
+    msg: "Keypair {{ item.item.name }} created"
+  loop: "{{ keypair_result.results }}"
+  when: item.item.name is defined

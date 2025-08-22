@@ -1,0 +1,65 @@
+---
+- name: Get Image ID by name
+  openstack.cloud.image_info:
+    auth: "{{ openstack_auth }}"
+    name: "{{ instance.image_name }}"
+  register: image_info
+
+- name: Get Flavor ID by name
+  openstack.cloud.compute_flavor_info:
+    auth: "{{ openstack_auth }}"
+    name: "{{ instance.flavor_name }}"
+  register: flavor_info
+
+- name: Get Network ID by name
+  openstack.cloud.networks_info:
+    auth: "{{ openstack_auth }}"
+    name: "{{ instance.network_name }}"
+  register: network_info
+
+- name: Get Project ID for admin
+  openstack.cloud.project_info:
+    auth: "{{ openstack_auth }}"
+    name: "{{ instance.project_name }}"
+  register: admin_project
+
+- name: Get Security Group ID in admin project
+  openstack.cloud.security_group_info:
+    auth: "{{ openstack_auth }}"
+    project_id: "{{ admin_project.projects[0].id }}"
+    name: "{{ instance.security_groups_name }}"
+  register: sg_info
+
+- name: Test multiple vars
+  debug:
+    msg: |
+      Image ID: {{ image_info.images[0].id }}
+      Keypair: {{ instance.keypair_name }}
+      Flavor ID: {{ flavor_info.flavors[0].id }}
+      Availability Zone: {{ instance.availability_zone }}
+      Security Group: {{ sg_info.security_groups[0].id }}
+      Network ID: {{ network_info.networks[0].id }}
+
+- name: Create a new instance with metadata and attaches it to a network
+  openstack.cloud.server:
+    state: present
+    auth: "{{ openstack_auth }}"
+    interface: public
+    name: "{{ instance.name }}"
+    image: "{{ image_info.images[0].id }}"
+    key_name: "{{ instance.keypair_name }}"
+    timeout: 600
+    flavor: "{{ flavor_info.flavors[0].id }}"
+    availability_zone: "{{ instance.availability_zone }}"
+    security_groups:
+      - "{{ sg_info.security_groups[0].name }}"
+    boot_from_volume: true
+    volume_size: "{{ instance.volume_size }}"
+    nics:
+      - net-id: "{{ network_info.networks[0].id }}"
+  register: create_result
+
+- name: Debug creation result
+  ansible.builtin.debug:
+    msg: "Instance {{ instance.name }} Created: {{ create_result.server.id }}"
+  when: create_result.server is defined

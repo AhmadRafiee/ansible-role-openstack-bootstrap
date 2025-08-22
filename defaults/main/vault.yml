@@ -1,0 +1,7 @@
+openstack_auth:
+  auth_url: "https://your-openstack-auth-url:5000/v3"
+  username: "admin"
+  password: "your-password"
+  project_name: "admin"
+  user_domain_name: "Default"
+  project_domain_name: "Default"

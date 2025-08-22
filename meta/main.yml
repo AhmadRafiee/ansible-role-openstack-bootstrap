@@ -1,0 +1,19 @@
+galaxy_info:
+  author: Ahmad Rafiee
+  description: Bootstrap OpenStack environment with flavors, networks, routers, keypairs, images, and instances
+  company: DockerMe.ir
+  license: MIT
+  min_ansible_version: 2.9
+  platforms:
+    - name: EL
+      versions:
+        - all
+    - name: Ubuntu
+      versions:
+        - all
+  galaxy_tags:
+    - openstack
+    - cloud
+    - automation
+    - infrastructure
+dependencies: []

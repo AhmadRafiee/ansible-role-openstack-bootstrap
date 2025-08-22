@@ -1,0 +1,24 @@
+---
+- name: Get instance info by name
+  openstack.cloud.server_info:
+    auth: "{{ openstack_auth }}"
+    name: "{{ instance.name }}"
+    interface: public
+  register: instance_info
+  failed_when: instance_info.servers | length == 0
+  ignore_errors: true
+
+- name: remove an instance
+  openstack.cloud.server:
+    auth: "{{ openstack_auth }}"
+    name: "{{ instance_info.servers[0].id }}"
+    state: absent
+    timeout: 600
+    interface: public
+  when: instance_info.servers | length > 0
+  register: delete_result
+
+- name: Debug deletion result
+  ansible.builtin.debug:
+    msg: "Instance {{ instance.name }} deleted: {{ delete_result }}"
+  when: instance_info.servers | length > 0

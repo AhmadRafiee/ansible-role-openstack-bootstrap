@@ -1,0 +1,43 @@
+---
+- name: Create networks
+  openstack.cloud.network:
+    state: present
+    auth: "{{ openstack_auth }}"
+    name: "{{ item.name }}"
+    provider_network_type: "{{ item.provider_network_type }}"
+    provider_physical_network: "{{ item.provider_physical_network | default(omit) }}"
+    external: "{{ item.external }}"
+    timeout: 300
+  loop: "{{ networks }}"
+  register: network_result
+  ignore_errors: true
+
+- name: Create subnets
+  openstack.cloud.subnet:
+    state: present
+    auth: "{{ openstack_auth }}"
+    network_name: "{{ item.item.name }}"
+    name: "{{ item.item.subnet_name }}"
+    cidr: "{{ item.item.cidr }}"
+    gateway_ip: "{{ item.item.gateway_ip }}"
+    dns_nameservers: "{{ item.item.dns_nameservers }}"
+    enable_dhcp: "{{ item.item.enable_dhcp }}"
+    allocation_pools: "{{ [{'start': item.item.allocation_pool_start, 'end': item.item.allocation_pool_end}] 
+                      if item.item.allocation_pool_start is defined and item.item.allocation_pool_end is defined 
+                      else omit }}"
+    timeout: 300
+  loop: "{{ network_result.results }}"
+  when: item.id is defined
+  register: subnet_result
+
+- name: Debug network creation
+  ansible.builtin.debug:
+    msg: "Network {{ item.item.name }} created with ID: {{ item.id }}"
+  loop: "{{ network_result.results }}"
+  when: item.id is defined
+
+- name: Debug subnet creation
+  ansible.builtin.debug:
+    msg: "Subnet {{ item.invocation.module_args.name }} created with ID: {{ item.id }}"
+  loop: "{{ subnet_result.results }}"
+  when: item.id is defined

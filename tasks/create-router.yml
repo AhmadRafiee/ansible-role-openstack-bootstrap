@@ -1,0 +1,45 @@
+---
+- name: Create router
+  openstack.cloud.router:
+    state: present
+    auth: "{{ openstack_auth }}"
+    name: "{{ router.name }}"
+    external_gateway_info:
+      network: "{{ router.external_network }}"
+    timeout: 300
+  register: router_result
+
+- name: Get subnet list
+  openstack.cloud.subnets_info:
+    auth: "{{ openstack_auth }}"
+    timeout: 300
+  register: subnet_info
+  ignore_errors: true
+
+- name: Get networks info
+  openstack.cloud.networks_info:
+    auth: "{{ openstack_auth }}"
+  register: networks_info
+
+- name: Gather interfaces to add
+  set_fact:
+    router_interfaces: "{{ router_interfaces | default([]) + [{
+      'net': (networks_info.networks | selectattr('id', 'equalto', item.network_id) | first).name,
+      'subnet': item.name,
+      'ip_address': item.gateway_ip }] }}"
+  loop: "{{ subnet_info.subnets }}"
+  when: item['router:external'] == false
+
+- name: Add all subnets to router
+  openstack.cloud.router:
+    auth: "{{ openstack_auth }}"
+    state: present
+    name: "{{ router.name }}"
+    interfaces: "{{ router_interfaces }}"
+  when: router_interfaces is defined and router_interfaces | length > 0
+  register: interface_result
+
+- name: Debug router creation
+  ansible.builtin.debug:
+    msg: "Router {{ router.name }} created with ID: {{ router_result.router.id }}"
+    when: router_result.router is defined and router_result.router.id is defined

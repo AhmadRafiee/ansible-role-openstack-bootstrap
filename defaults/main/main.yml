@@ -1,0 +1,99 @@
+---
+flavors:
+  - name: Tiny
+    ram: 1024
+    vcpus: 1
+    disk: 10
+    is_public: true
+  - name: Small
+    ram: 2048
+    vcpus: 1
+    disk: 20
+    is_public: true
+  - name: Medium
+    ram: 4096
+    vcpus: 4
+    disk: 40
+    is_public: true
+  - name: Large
+    ram: 8192
+    vcpus: 8
+    disk: 80
+    is_public: true
+
+networks:
+  - name: Public
+    external: true
+    subnet_name: public_subnet
+    enable_dhcp: true
+    cidr: "192.168.202.0/24"
+    gateway_ip: "192.168.202.1"
+    dns_nameservers: ["8.8.8.8", "8.8.4.4"]
+    allocation_pool_start: "192.168.202.100"
+    allocation_pool_end: "192.168.202.240"
+    provider_network_type: flat
+    provider_physical_network: physnet1
+
+  - name: Private
+    external: false
+    subnet_name: private_subnet
+    enable_dhcp: false
+    cidr: "10.20.30.0/24"
+    gateway_ip: "10.20.30.1"
+    dns_nameservers: ["8.8.8.8", "8.8.4.4"]
+    allocation_pool_start: "10.20.30.100"
+    allocation_pool_end: "10.20.30.240"
+    provider_network_type: vxlan
+
+  - name: zun_net
+    external: false
+    subnet_name: zun_sub
+    enable_dhcp: false
+    cidr: "20.30.40.0/24"
+    gateway_ip: "20.30.40.1"
+    dns_nameservers: ["8.8.8.8", "8.8.4.4"]
+    allocation_pool_start: "20.30.40.100"
+    allocation_pool_end: "20.30.40.240"
+    provider_network_type: vxlan
+
+router:
+  name: "Router"
+  external_network: "Public"
+
+ssh_keys:
+  - name: Ahmad
+    public_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDjf9rnLY0YMPVu4Rp6g2rj36TTceoZdPvHl5SrI1YdtWi0iSGvs167Gt+tuqf03RSOS3B+sd7W+3LgJc3tgrPykF+nc+yro++CXRmwI+OO/eF6UNNslXQXxOhj4ZCdbz8q4pxLk48aUkLQdjcIPsKDFjEub8OEWcdpqSmOSF8JJerPtWE7pfW4pl8v+MMyDXtD9jkSnOTKO4kYvTKMGOptB4xHqkrC3KO6icKJIZQw38I4KWZhBnskVMPG7PSzBS1pa/pmy0ayNy9Z0iYSwzG/ESbDlH/PdGeMyEoIJFBSvjBxGTRF+HLA3xEdECoxr28xg6f921brocGysRLAUGfX ahmad@ahmad"
+  - name: Node_Labe
+    public_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDO58YbSuAFZogLndHHoWpetGeK0DVOXF+m52Lre9FL1RjC3RwqRTjORDn/FvKrho+JlWvoUiDi/lxC9Vmn/wLod4fEfHJvPRQNVpxynlS3WELDEdXwTbP3xXtwuoxt8a0qtAVaxyPABRrj+52xSZyabBnb6AZWHv7KaaJPg2Ft/3eiXTL83aRmeNhijVbherWU0nFN+GwliRcRHhdxfUFoQOGyN6zkntNYKCOZFJhVLogtHWrb0T8XxxUuOjEv6iXfleZyVAmht0NZNBDnVsk4dp1EWJpY6vfgMuw3PgfGE0tCCuuiQEY5n2AgZADnFvd8t9MJREUrvSVIQp3MDQ01TTdrZlgzKcWRSjJnOzpOJ920N4xjdSv1+55XZmN64aqzxUViUsfG63ylXZPAD0P91GPNa2sZUeYtp3i7fRzOBt5l8fjVK5FUXmocOoPB9uhgyTVJf279pFP6TnBUxQE6OnhHb2eBMx3vp6ogAyn9nlz3WutfmgjsbJx0K+yRhCc= root@cloud-host"
+
+image_path: "~/Desktop/cloud-images"
+images_to_upload:
+  - name: "Cirros"
+    url: "https://download.cirros-cloud.net/0.6.3/cirros-0.6.3-x86_64-disk.img"
+    container_format: "bare"
+    image_format: "raw"
+    disk_format: "qcow2"
+
+  - name: "Ubuntu_24.04"
+    url: "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
+    container_format: "bare"
+    image_format: "raw"
+    disk_format: "qcow2"
+
+  - name: "Debian12"
+    url: "https://cloud.debian.org/images/cloud/bookworm/20250814-2204/debian-12-generic-amd64-20250814-2204.qcow2"
+    container_format: "bare"
+    image_format: "qcow2"
+    disk_format: "qcow2"
+
+instance:
+  image_name: "Ubuntu_24.04"
+  keypair_name: "Ahmad"
+  flavor_name: "Small"
+  region_name: "RegionOne"
+  availability_zone: "nova"
+  network_name: "Public"
+  project_name: "admin"
+  security_groups_name: "default"
+  name: "ansible_instance_test"
+  volume_size: "10"

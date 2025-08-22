@@ -1,0 +1,40 @@
+---
+- name: Create OpenStack flavors
+  import_tasks: create-flavor.yml
+  tags:
+    - create_flavor
+    - preparing_openstack
+
+- name: Create OpenStack network
+  import_tasks: create-network.yml
+  tags:
+    - create_network
+    - preparing_openstack
+
+- name: Create OpenStack router
+  import_tasks: create-router.yml
+  tags:
+    - create_router
+    - preparing_openstack
+
+- name: Create OpenStack keypair
+  import_tasks: create-keypair.yml
+  tags:
+    - create_keypair
+    - preparing_openstack
+
+- name: Create OpenStack image
+  import_tasks: create-image.yml
+  tags:
+    - create_image
+    - preparing_openstack
+
+- name: create instance on openstack
+  import_tasks: create-instance.yml
+  tags:
+    - create_instance
+
+- name: delete instance on openstack
+  import_tasks: delete-instance.yml
+  tags:
+    - delete_instance
